@@ -1,84 +1,22 @@
 ﻿@page "/"
-
-
+@page "/index"
 @attribute [StreamRendering]
-@rendermode InteractiveServer
-@inject ServiciosSingleton serviciosSingleton
 @inject IServicioPeliculas servicioPeliculas
 
 <PageTitle>Home</PageTitle>
-
-<HeadContent>
-    <meta name="description" content="Esta es la pagina de inicio de Blazor Peliculas" />
-</HeadContent>
-
-<p>Servicios Singleton: @serviciosSingleton.Valor</p>
-
-<BPBoton id="mi-boton" name="mi-boton" class="p-3" OnClick="ManejarClick"></BPBoton>
-<BPBoton OnClick="@(()=>ManejarClick("Mensaje desde el Boton 2"))">
-    Mi Texto Personalizado
-</BPBoton>
-
-
-@* <BPBoton></BPBoton>
-<BPBoton Variante="Variante.advertencia" Tamaño="Tamaño.lg"></BPBoton>
-<BPBoton Variante="Variante.error" Tamaño="Tamaño.sm"></BPBoton>
-<BPBoton Texto="Cargar Peliculas" Disabled="true" Tipo="BotonTipo.submit" Variante="Variante.exitoso"></BPBoton> *@
-
-<hr />
-
-@*@<input type="checkbox" @onchange="@(()=>mostrarPeliculas = !mostrarPeliculas)"/>*@
-<input type="checkbox" @bind="mostrarPeliculas"/>
-
-Mostrar Peliculas
-@if (mostrarPeliculas)
-{
-    <BPBoton OnClick="LimpiarPeliculas">
-        Limpiar Peliculas en Carteleras
-    </BPBoton>
     
-    <h3>En cartelera</h3>
-    <ListadoPeliculas Peliculas="enCartelera" @ref="listadoPeliculas">
-       @*  <Cargando>Cargando las Peliculas en cartelera....</Cargando>
-        <NoHayRegistros>
-            No hay peliculas en cartelera....
-            <input />
-            <BPBoton></BPBoton>
+<h3>En cartelera</h3>
+<ListadoPeliculas Peliculas="enCartelera" ></ListadoPeliculas>
 
-        </NoHayRegistros> *@
-    </ListadoPeliculas>
+<h3>Futuros Estrenos</h3>
+<ListadoPeliculas Peliculas="futurosEstrenos"></ListadoPeliculas>
 
-    <h3>Futuros Estrenos</h3>
-    <ListadoPeliculas Peliculas="futurosEstrenos"></ListadoPeliculas>
-}
 @code
 {
-    private bool mostrarPeliculas = true;
-    private ListadoPeliculas? listadoPeliculas;
-
-    public void LimpiarPeliculas() => listadoPeliculas?.LimpiarPeliculas();
-
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(2));
-            enCartelera = servicioPeliculas.ObtenerPeliculas();
-            futurosEstrenos = servicioPeliculas.ObtenerPeliculas(); 
-            StateHasChanged(); //avisa refresh
-        }
-    }
-
-    private void ManejarClick()
-    {
-        Console.WriteLine("Click en el boton desde el Padre");
-        mostrarPeliculas = !mostrarPeliculas;
-    }
-
-    private void ManejarClick(string mensaje)
-    {
-        Console.WriteLine(mensaje);
+        enCartelera = servicioPeliculas.ObtenerPeliculas();
+        futurosEstrenos = servicioPeliculas.ObtenerPeliculas(); 
     }
 
     private List<Pelicula>? enCartelera=null;

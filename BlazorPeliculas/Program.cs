@@ -8,19 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddTransient<ServiciosTransient>();
-builder.Services.AddScoped<ServiciosScoped>();
-builder.Services.AddSingleton<ServiciosSingleton>();
-
 builder.Services.AddScoped<IServicioPeliculas, ServicioPeliculasEnMemoria>();
-
-//builder.Services.AddCascadingValue(sp => new AppState());// Agrega AppState como un servicio de cascada
-builder.Services.AddScoped<AppStateService>(); // Agrega AppStateService como un servicio de ámbito (scoped)
-builder.Services.AddCascadingValue(options =>
-{
-    var state =  options.GetRequiredService<AppStateService>();// Obtiene el servicio AppStateService
-    return state.Source; // Devuelve la fuente de valor de cascada del estado   
-});
 
 var app = builder.Build();
 
