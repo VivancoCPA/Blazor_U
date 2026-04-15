@@ -1,0 +1,64 @@
+﻿@page "/bind-after"
+@rendermode InteractiveServer
+
+<h3>Bind After</h3>
+
+<input @bind="busqueda" @bind:after="Buscar"  @bind:event="oninput" />
+
+@if(!string.IsNullOrEmpty(busqueda))
+{
+    if(cargando)
+    {
+        <p><Cargando></Cargando></p>
+        
+    }
+    else if (personasEncontradas.Count == 0)
+    {
+        <p>No se encontraron personas</p>
+    }
+    else
+    {
+        <p>Se encontraron personas</p>
+        <ul>
+            @foreach (var persona in personasEncontradas)
+            {
+                <li @key="persona">@persona</li>
+            }
+        </ul>
+    }
+}
+
+
+@code {
+    private string busqueda = string.Empty;
+    private List<string> personasEncontradas = [];
+    private bool cargando = false;
+
+    private async Task Buscar()
+    {
+        cargando = true;
+        var personas = new List<string>
+        {
+            "Batman",
+            "Superman",
+            "Mujer Maravilla",
+            "Flash",
+        };
+
+        await Task.Delay(TimeSpan.FromSeconds(2));
+
+        personasEncontradas = personas
+            .Where(x => x.Contains(busqueda, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        cargando = false;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            busqueda = "Batman";
+            StateHasChanged();
+        }
+    }
+}

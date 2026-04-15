@@ -1,0 +1,28 @@
+﻿@typeparam T
+
+@if (Listado is null)
+{
+    @Cargando
+}
+else if (Listado.Count == 0)
+{
+    @NoHayRegistros
+}
+
+else
+{
+    @foreach (var item in Listado)
+    {
+        @ChildContent(item)
+    }
+}
+
+
+
+
+@code {
+    [Parameter, EditorRequired] public List<T>? Listado { get; set; }   
+    [Parameter] public RenderFragment? Cargando { get; set; }= @<Cargando></Cargando>;
+    [Parameter] public RenderFragment? NoHayRegistros { get; set; }= @<text>No hay peliculas para mostrar...</text>;
+    [Parameter, EditorRequired] public RenderFragment<T> ChildContent { get; set; }= null!;
+}

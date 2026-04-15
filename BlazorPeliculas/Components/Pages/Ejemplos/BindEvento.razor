@@ -1,0 +1,10 @@
+﻿@page "/bindevento"
+@rendermode InteractiveServer
+
+<input @bind="valor" @bind:event="oninput" />
+
+<p>Valor: @valor</p>
+
+@code {
+    string? valor;
+}
