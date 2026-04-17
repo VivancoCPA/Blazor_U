@@ -1,4 +1,13 @@
 ﻿@inherits LayoutComponentBase
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
 
 <div class="page">
     <div class="sidebar">
@@ -13,6 +22,10 @@
         <article class="content px-4">
             @Body
         </article>
+
+        <footer class="footer px-4">
+            <span>© @DateTime.Now.Year - Blazor Películas</span>
+        </footer>
     </main>
 </div>
 

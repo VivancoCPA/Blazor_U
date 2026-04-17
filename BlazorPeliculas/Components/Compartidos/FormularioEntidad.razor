@@ -1,0 +1,79 @@
+﻿@implements IDisposable
+@inject IJSRuntime JS
+@typeparam T where T : class
+
+<!-- para ello se tiene q activar el render mode global-->
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation"></NavigationLock>
+
+<EditForm EditContext="editContext" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+   
+    @ChildContent
+
+    <BPBoton Tipo="BotonTipo.submit" Disabled="@(formularioInvalido || PosteoEnCurso)">
+        @(PosteoEnCurso ?@<text>Enviando...</text> : @<text>Enviar</text>)
+    </BPBoton>
+</EditForm>
+
+@code {
+    private EditContext? editContext;
+    private bool formularioInvalido = true;
+    [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] public T Entidad { get; set; } = default!;
+    [Parameter, EditorRequired] public bool FormularioPosteadoConExito { get; set; } = false;
+    [Parameter, EditorRequired] public bool PosteoEnCurso { get; set; } = false;
+    [Parameter, EditorRequired] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public bool FormularioInvalido { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+
+        editContext = new EditContext(Entidad);
+        editContext.OnFieldChanged += HandleFieldChanged;
+        formularioInvalido = FormularioInvalido;
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Aquí puedes manejar los cambios en los campos del formulario
+        // Por ejemplo, puedes validar el campo o actualizar el estado del componente
+        if (editContext is not null)
+        {
+            formularioInvalido = !editContext.Validate();
+            StateHasChanged();
+
+        }
+        ;
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+
+        var formularioFueEditado = editContext!.IsModified();
+
+        if (!formularioFueEditado)
+        {
+            // Permitir la navegación sin mostrar el mensaje de confirmación
+            return;
+        }
+        if (FormularioPosteadoConExito)
+        {
+            return;
+        }
+        // Mostrar un mensaje de confirmación al usuario
+        var confirmacion = await JS.Confirm("¿Estás seguro de que deseas abandonar esta página? Se perderán los cambios no guardados.");
+        if (!confirmacion)
+        {
+            // Cancelar la navegación si el usuario no confirma
+            context.PreventNavigation();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
+}
