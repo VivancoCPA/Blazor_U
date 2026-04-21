@@ -1,5 +1,6 @@
 ﻿@page "/generos/editar/{Id:int}"
 @inject NavigationManager navigationManager
+@inject IServicioGeneros servicioGeneros
 
 <h3>Editar Genero</h3>
 @if(genero is null)
@@ -23,9 +24,21 @@
     private bool posteoEnCurso = false;
     private bool formularioPosteadoConExito = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        genero = new() { Id = Id, Nombre = "Acción" };
+        if (!firstRender)
+        {
+            return;
+        }
+
+        genero = await servicioGeneros.ObtenerPorId(Id);
+
+        if (genero is null)
+        {
+            navigationManager.NavigateTo("/generos");
+        }
+
+        StateHasChanged();
     }
 
     private async Task Editar()
@@ -34,9 +47,10 @@
         {
             posteoEnCurso = true;
             // Lógica para crear el género
-            Console.WriteLine("Ejecutando metodo Editar");
-            await Task.Delay(2000);
-            Console.WriteLine($"Editando género: {genero.Nombre}");
+            await Task.Yield();
+
+            await servicioGeneros.Actualizar(genero!);
+
             posteoEnCurso = false;
             formularioPosteadoConExito = true;
             StateHasChanged();// Actualizar la interfaz de usuario para reflejar el cambio en el estado del formulario

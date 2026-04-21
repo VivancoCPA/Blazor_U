@@ -1,6 +1,9 @@
 ﻿@page "/generos/crear"
+@using BlazorPeliculas.Datos
+@using Microsoft.EntityFrameworkCore
 @rendermode InteractiveServer
 @inject NavigationManager navigationManager
+@inject IServicioGeneros servicioGeneros
 
 <h3>Crear Genero</h3>
 
@@ -26,10 +29,11 @@
         if (!posteoEnCurso)
         {
             posteoEnCurso = true;
+            StateHasChanged(); // Actualizar la interfaz de usuario para reflejar el cambio en el estado del formulario
+            await Task.Yield(); // Permitir que la interfaz de usuario se actualice antes de continuar con la lógica de creación del género
+
+            await servicioGeneros.Crear(genero);
             // Lógica para crear el género
-            Console.WriteLine("Ejecutando metodo CRear");
-            await Task.Delay(2000);
-            Console.WriteLine($"Creando género: {genero.Nombre}");
             posteoEnCurso = false;
             formularioPosteadoConExito = true;
             StateHasChanged();// Actualizar la interfaz de usuario para reflejar el cambio en el estado del formulario

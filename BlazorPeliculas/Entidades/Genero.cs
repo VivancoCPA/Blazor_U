@@ -9,4 +9,5 @@ public class Genero
     [Required(ErrorMessage = "El campo {0} es obligatorio")]
     [PrimeraLetraMayuscula]
     public string? Nombre { get; set; }
+    public List<GeneroPelicula> GenerosPelicula { get; set; } = [];//
 }

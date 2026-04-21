@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using BlazorPeliculas.DTOs;
+using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorPeliculas.Entidades;
 
@@ -12,8 +14,12 @@ public class Pelicula
     public string? Trailer { get; set; }
     public DateTime? FechaLanzamiento { get; set; }
     public string? PosterURL { get; set; }
+    [NotMapped]
     public IBrowserFile? PosterArchivo { get; set; }
+    [NotMapped]
+    public ArchivoDTO? Archivo { get; set; }
     public List<GeneroPelicula> GenerosPelicula { get; set; } = [];
     public List<ActorPelicula> ActoresPelicula { get; set; } = [];
+    public string? TituloFormateadoParaURL => Titulo?.Replace(" ", "-");
 
 }

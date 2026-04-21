@@ -13,6 +13,10 @@
     <BPBoton Tipo="BotonTipo.submit" Disabled="@(formularioInvalido || PosteoEnCurso)">
         @(PosteoEnCurso ?@<text>Enviando...</text> : @<text>Enviar</text>)
     </BPBoton>
+
+    <BPLink Variante="Variante.secundario" Href="@DestinoCancelar">
+        Cancelar
+    </BPLink>
 </EditForm>
 
 @code {
@@ -23,6 +27,7 @@
     [Parameter, EditorRequired] public bool FormularioPosteadoConExito { get; set; } = false;
     [Parameter, EditorRequired] public bool PosteoEnCurso { get; set; } = false;
     [Parameter, EditorRequired] public EventCallback OnValidSubmit { get; set; }
+    [Parameter, EditorRequired] public string DestinoCancelar { get; set; } 
     [Parameter] public bool FormularioInvalido { get; set; } = true;
 
     protected override void OnInitialized()

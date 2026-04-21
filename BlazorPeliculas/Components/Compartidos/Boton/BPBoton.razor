@@ -1,9 +1,11 @@
-﻿<button @attributes="AtributosAdicionales" type="@Tipo.ToString()" disabled="@Disabled"
-class="@ClaseCSS" @onclick="OnClick"
+﻿@* @inject IJSRuntime JS *@
+@inject IDialogService DialogService
+
+<button @attributes="AtributosAdicionales" type="@Tipo.ToString()" disabled="@Disabled"
+class="@ClaseCSS" @onclick="@(() => OnClickInterno(_topCenter))"
 >@ChildContent</button>
 
 @code {
-    //[Parameter] public required string Texto { get; set; } = "Enviar";
     [Parameter] public bool Disabled { get; set; } = false;
     [Parameter] public BotonTipo Tipo { get; set; } = BotonTipo.button;
     [Parameter] public Variante Variante { get; set; } = Variante.primario;
@@ -12,7 +14,32 @@ class="@ClaseCSS" @onclick="OnClick"
         public Dictionary<string, object>? AtributosAdicionales { get; set; } 
     [Parameter] public EventCallback OnClick { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; } = @<text>Enviar</text>  ;
+    [Parameter] public string? MensajeConfirmacion { get; set; }
+    private readonly DialogOptions _topCenter = new() { Position = DialogPosition.TopCenter };
 
+    private async Task OnClickInterno(DialogOptions options)
+    {
+        if (!string.IsNullOrEmpty(MensajeConfirmacion))
+        {
+            // var confirmado = await JS.Confirm(MensajeConfirmacion);
+
+            // if (!confirmado)
+            // {
+            //     return;
+            // }
+            bool? result = await DialogService.ShowMessageBoxAsync(
+            "Warning", 
+            MensajeConfirmacion, 
+            yesText:"Delete!", cancelText:"Cancel", options: options);
+            var state = result == null ? "Canceled" : "Deleted!";
+            if (state == "Canceled")
+            {
+                return;
+            }
+        }
+
+        await OnClick.InvokeAsync();
+    }
         
     private string ClaseCSS
     {
