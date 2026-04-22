@@ -1,6 +1,5 @@
 ﻿@page "/peliculas/{Id:int}"
 @page "/peliculas/{Id:int}/{NombrePelicula}"
-@inject IJSRuntime JS
 @using Microsoft.AspNetCore.WebUtilities
 @inject IServicioPeliculas servicioPeliculas
 @inject NavigationManager navigationManager
@@ -109,36 +108,17 @@ else
          var usuarioEstaAutenticado = authenticationState.User.Identity is not null
                                      && authenticationState.User.Identity.IsAuthenticated;
 
-         var options = new DialogOptions
-         {
-            NoHeader = true,
-            MaxWidth = MaxWidth.ExtraExtraLarge,
-            CloseOnEscapeKey = true,
 
-         };
         if (usuarioEstaAutenticado)
          {
              var votoPeliculaDTO = new VotoPeliculaDTO(Id, voto);
              await servicioVotos.Votar(votoPeliculaDTO);
              
-             var parameters = new DialogParameters<ConfirmacionModal>
-                {
-                    { x => x.mainMessage, "La votación fue guardada con éxito." },
-                    { x => x.IsSuccess, true }
-                };
-            await DialogService.ShowAsync<ConfirmacionModal>("", parameters, options);
-             
-        //     await JS.MostrarAlertaExitosa("Exitoso", "La votación fue guardada con éxito");
+             await DialogService.ShowAlerta("Hubo un problema al procesar.", esExito: true);
          }
          else
          {
-            var parameters = new DialogParameters<ConfirmacionModal>
-                {
-                    { x => x.mainMessage, "Debe loguearse para poder Votar." },
-                    { x => x.IsSuccess, false }
-                };
-             await DialogService.ShowAsync<ConfirmacionModal>("", parameters, options);
-             //await JS.MostrarAlertaError("Error", "Debe loguearse para poder votar");
+            await DialogService.ShowAlerta("Hubo un problema al procesar.", esExito: false);
          }
         
 
