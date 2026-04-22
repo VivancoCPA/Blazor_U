@@ -3,11 +3,13 @@ using BlazorPeliculas.DTOs;
 using BlazorPeliculas.Entidades;
 using BlazorPeliculas.Utilidades;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BlazorPeliculas.Servicios
 {
     public class ServicioPeliculas(IDbContextFactory<ApplicationDbContext> dbFactory,
-        IAlmacenadorArchivos almacenadorArchivos) : IServicioPeliculas
+        IAlmacenadorArchivos almacenadorArchivos,
+        IHttpContextAccessor httpContextAccessor) : IServicioPeliculas
     {
         private readonly string contenedor = "peliculas";
 
@@ -128,7 +130,12 @@ namespace BlazorPeliculas.Servicios
                     p.GenerosPelicula.Select(gp => gp.GeneroId).Contains(parametros.GeneroId));
             }
 
-            // TODO: Implementar votación
+            if (parametros.MasVotadas)
+            {
+                peliculasQueryable = peliculasQueryable.OrderByDescending(p =>
+                            p.VotosPeliculas.Average(vp => vp.Voto));//
+            }
+
 
             var peliculas = await peliculasQueryable.Paginar(parametros.PaginacionDTO).ToListAsync();
             var conteo = await peliculasQueryable.CountAsync();
@@ -140,7 +147,6 @@ namespace BlazorPeliculas.Servicios
             };
 
             return respuesta;
-
 
         }
 
@@ -173,9 +179,29 @@ namespace BlazorPeliculas.Servicios
                 return null;
             }
 
-            // TODO: Sistema de votación
-            var promedioVoto = 4;
-            var votoUsuario = 5;
+            
+            var promedioVoto = 0.0;
+            var votoUsuario = 0;
+            if (await context.VotosPeliculas.AnyAsync(x => x.PeliculaId == id))
+            {
+                promedioVoto = await context.VotosPeliculas.Where(x => x.PeliculaId == id)
+                                      .AverageAsync(x => x.Voto);//promedio
+
+                if (httpContextAccessor.HttpContext is not null
+                        && httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated)
+                {
+                    var usuarioId = httpContextAccessor.HttpContext
+                                .User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+                    var votoUsuarioDB = await context.VotosPeliculas
+                        .FirstOrDefaultAsync(x => x.PeliculaId == id && x.UsuarioId == usuarioId);
+
+                    if (votoUsuarioDB is not null)
+                    {
+                        votoUsuario = votoUsuarioDB.Voto;
+                    }
+                }
+            }
 
             var modelo = new PeliculaDetalleDTO();
             modelo.Pelicula = pelicula;

@@ -20,6 +20,7 @@ public class Pelicula
     public ArchivoDTO? Archivo { get; set; }
     public List<GeneroPelicula> GenerosPelicula { get; set; } = [];
     public List<ActorPelicula> ActoresPelicula { get; set; } = [];
+    public List<VotoPelicula> VotosPeliculas { get; set; } = [];
     public string? TituloFormateadoParaURL => Titulo?.Replace(" ", "-");
 
 }

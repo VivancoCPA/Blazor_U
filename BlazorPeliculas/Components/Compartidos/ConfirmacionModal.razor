@@ -1,0 +1,43 @@
+﻿<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column align-center py-4">
+            @if (IsSuccess)
+            {
+                @* Ícono de confirmación con color verde *@
+                <MudIcon Icon="@Icons.Material.Filled.Check"
+                    Color="Color.Success"
+                    Style="font-size: 5rem;" />
+                <MudText Typo="Typo.h5" Class="mt-4">Exitoso!</MudText>
+            }
+            else
+            {
+                @* Ícono de Error *@
+                <MudIcon Icon="@Icons.Material.Filled.ErrorOutline"
+                         Color="Color.Error"
+                         Style="font-size: 5rem;" />
+                <MudText Typo="Typo.h5" Class="mt-4">¡Error!</MudText>
+            }
+            <p></p>
+            <MudText Typo="Typo.body1" Class="mud-text-secondary">@mainMessage</MudText>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <div class="d-flex justify-center w-100 pb-4">
+            @* Botón púrpura como el de la imagen *@
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="Submit"
+                       Style="background-color: #7B1FA2; min-width: 100px;">
+                OK
+            </MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter, EditorRequired] public string mainMessage { get; set; }
+    [Parameter] public bool IsSuccess { get; set; } = true; // Por defecto éxito
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    
+}

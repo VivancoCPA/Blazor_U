@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @inject NavigationManager navigationManager
 @inject IServicioGeneros servicioGeneros
+@attribute [Authorize(Roles = "administrador")]
 
 <h3>Crear Genero</h3>
 

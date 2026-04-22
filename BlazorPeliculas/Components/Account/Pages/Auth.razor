@@ -2,12 +2,62 @@
 
 @using Microsoft.AspNetCore.Authorization
 
-@attribute [Authorize]
+@* @attribute [Authorize] *@
 
 <PageTitle>Auth</PageTitle>
 
-<h1>You are authenticated</h1>
+<h1>@mensajeAutenticacion</h1>
 
-<AuthorizeView>
-    Hello @context.User.Identity?.Name!
+<AuthorizeView >
+    <Authorized>
+        Hello @context.User.Identity?.Name!
+        <hr />
+        Claims del Usuario
+        <ul>
+            @foreach (var claim in context.User.Claims)
+            {
+                <li>@claim.Type: @claim.Value</li>
+            }
+        </ul>
+        @if (tienePassword)
+        {
+            <p>El usuario se ha autenticado con cuenta propia usando un password.</p>    
+        }
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized to view this content.
+    </NotAuthorized>
+    <Authorizing>
+        Checking authentication status...
+    </Authorizing>
 </AuthorizeView>
+
+
+
+
+@code{
+    private string mensajeAutenticacion = "Auntenticando.....";
+    private bool tienePassword = false;
+    [CascadingParameter]
+    // El componente AuthorizeView se encarga de obtener el estado de autenticación, pero también podemos obtenerlo manualmente a través del servicio AuthenticationStateProvider
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await authenticationStateTask!;
+        var usuarioEstaAutenticado = authenticationState.User.Identity is not null &&
+                    authenticationState.User.Identity.IsAuthenticated;
+
+        mensajeAutenticacion = usuarioEstaAutenticado ? "Usuario autenticado" : "Usuario no autenticado";
+
+        if (usuarioEstaAutenticado)
+        {
+            var claimAMR = authenticationState.User.Claims.FirstOrDefault(c => c.Type == "amr");
+            if (claimAMR is not null && claimAMR.Value == "pwd")
+            {
+                tienePassword = true;    
+            }
+        }
+
+    }
+}
