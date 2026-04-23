@@ -1,0 +1,63 @@
+﻿@page "/generos/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager navigationManager
+@inject IServicioGeneros servicioGeneros
+@attribute [Authorize(Roles = "administrador")]
+
+<h3>Editar Genero</h3>
+@if(genero is null)
+{
+    <Cargando></Cargando>
+}else
+{
+    <FormularioGenero 
+        Genero="genero"
+        PosteoEnCurso="posteoEnCurso"
+        FormularioPosteadoConExito="formularioPosteadoConExito"
+        FormularioInvalido="false"
+        OnValidSubmit="Editar">
+    </FormularioGenero>
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Genero genero = null!;
+    private bool posteoEnCurso = false;
+    private bool formularioPosteadoConExito = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        genero = await servicioGeneros.ObtenerPorId(Id);
+
+        if (genero is null)
+        {
+            navigationManager.NavigateTo("/generos");
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task Editar()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            // Lógica para crear el género
+            await Task.Yield();
+
+            await servicioGeneros.Actualizar(genero!);
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();// Actualizar la interfaz de usuario para reflejar el cambio en el estado del formulario
+            navigationManager.NavigateTo("/generos");// Redirigir a la página de índice de géneros después de crear el género
+
+        }
+    }
+}

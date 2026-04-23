@@ -1,0 +1,44 @@
+﻿@page "/generos/crear"
+
+@rendermode InteractiveServer
+@inject NavigationManager navigationManager
+@inject IServicioGeneros servicioGeneros
+@attribute [Authorize(Roles = "administrador")]
+
+<h3>Crear Genero</h3>
+
+<FormularioGenero 
+    Genero="genero" 
+    PosteoEnCurso="posteoEnCurso" 
+    FormularioPosteadoConExito="formularioPosteadoConExito" 
+    OnValidSubmit="Crear">
+</FormularioGenero>
+
+@code {
+    private Genero genero = null! ;
+    private bool posteoEnCurso = false;
+    private bool formularioPosteadoConExito = false;
+
+    protected override void OnInitialized()
+    {
+        genero = new Genero();
+    }
+
+    private async Task Crear()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            StateHasChanged(); // Actualizar la interfaz de usuario para reflejar el cambio en el estado del formulario
+            await Task.Yield(); // Permitir que la interfaz de usuario se actualice antes de continuar con la lógica de creación del género
+
+            await servicioGeneros.Crear(genero);
+            // Lógica para crear el género
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();// Actualizar la interfaz de usuario para reflejar el cambio en el estado del formulario
+            navigationManager.NavigateTo("/generos");// Redirigir a la página de índice de géneros después de crear el género
+
+        }
+    }
+}

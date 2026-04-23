@@ -1,12 +1,13 @@
 ﻿
 using BlazorPeliculas.Constantes;
 using BlazorPeliculas.Datos;
-using BlazorPeliculas.DTOs;
+using BlazorPeliculas.Client.DTOs;
 using BlazorPeliculas.Entidades;
 using BlazorPeliculas.Utilidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BlazorPeliculas.Client.Servicios;
 
 namespace BlazorPeliculas.Servicios;
 
